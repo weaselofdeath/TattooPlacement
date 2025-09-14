@@ -9,21 +9,30 @@ let isDraggingMove = false;
 let isDraggingScaleRotate = false;
 let dragStart = { x: 0, y: 0 };
 let initialLayerState = {};
+let isCameraMoving = false;
+let mouseDownPosition = { x: 0, y: 0 };
 
 export function initGizmoEvents(state) {
     appState = state;
     const canvas = appState.renderer.domElement;
-    // THIS IS THE FIX: The onCanvasClick function is now defined and used here.
     canvas.addEventListener('click', (event) => onCanvasClick(event, false));
 
-    // Pivot Helper Visibility
-    canvas.addEventListener('mousedown', () => {
+    // Track mouse movement to differentiate between camera movement and clicks
+    canvas.addEventListener('mousedown', (event) => {
+        isCameraMoving = false;
+        mouseDownPosition = { x: event.clientX, y: event.clientY };
         if (appState.pivotHelper) appState.pivotHelper.visible = true;
     });
-    canvas.addEventListener('mouseup', () => {
-        if (appState.pivotHelper) appState.pivotHelper.visible = false;
+
+    canvas.addEventListener('mousemove', (event) => {
+        const dx = event.clientX - mouseDownPosition.x;
+        const dy = event.clientY - mouseDownPosition.y;
+        if (Math.sqrt(dx * dx + dy * dy) > 5) {
+            isCameraMoving = true;
+        }
     });
-    canvas.addEventListener('mouseleave', () => {
+
+    canvas.addEventListener('mouseup', () => {
         if (appState.pivotHelper) appState.pivotHelper.visible = false;
     });
 
@@ -42,7 +51,7 @@ export function initGizmoEvents(state) {
         isDraggingScaleRotate = true;
         appState.controls.enabled = false;
 
-        const centerPoint2D = toScreenPosition(appState.activeLayer.lastIntersect.clone().applyMatrix4(appState.currentModel.matrixWorld), appState.camera);
+        const centerPoint2D = toScreenPosition(appState.activeLayer.lastIntersect, appState.camera);
         dragStart.x = e.clientX;
         dragStart.y = e.clientY;
 
@@ -62,7 +71,7 @@ export function initGizmoEvents(state) {
         if (isDraggingScaleRotate) {
             if (!appState.activeLayer || !appState.activeLayer.lastIntersect) return;
 
-            const centerPoint2D = toScreenPosition(appState.activeLayer.lastIntersect.clone().applyMatrix4(appState.currentModel.matrixWorld), appState.camera);
+            const centerPoint2D = toScreenPosition(appState.activeLayer.lastIntersect, appState.camera);
             const dx = e.clientX - centerPoint2D.x;
             const dy = e.clientY - centerPoint2D.y;
 
@@ -93,36 +102,37 @@ export function updateGizmoPositions(state) {
     const moveHandle = document.getElementById('move-handle');
     const scaleRotateHandle = document.getElementById('scale-rotate-handle');
 
+    // --- ICON INJECTION (only once) ---
+    if (moveHandle && !moveHandle.querySelector('svg')) {
+        moveHandle.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" style="position:absolute;top:0;left:0;right:0;bottom:0;margin:auto;display:block;pointer-events:none;" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 2v16M2 10h16M5 5l10 10M15 5L5 15" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>`;
+    }
+    if (scaleRotateHandle && !scaleRotateHandle.querySelector('svg')) {
+        scaleRotateHandle.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" style="position:absolute;top:0;left:0;right:0;bottom:0;margin:auto;display:block;pointer-events:none;" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 3a7 7 0 1 1-7 7" stroke="white" stroke-width="2" fill="none"/>
+            <polygon points="10,0 13,7 7,7" fill="white"/>
+        </svg>`;
+    }
+
     if (!appState.activeLayer || !appState.activeLayer.lastIntersect) {
         moveHandle.style.display = 'none';
         scaleRotateHandle.style.display = 'none';
         return;
     }
 
-    const centerPoint3D = appState.activeLayer.lastIntersect.clone().applyMatrix4(appState.currentModel.matrixWorld);
+    // Use lastIntersect directly (already in world space)
+    const centerPoint3D = appState.activeLayer.lastIntersect.clone();
     const centerPoint2D = toScreenPosition(centerPoint3D, appState.camera);
-
     moveHandle.style.display = 'block';
     moveHandle.style.left = `${centerPoint2D.x}px`;
     moveHandle.style.top = `${centerPoint2D.y}px`;
 
-    const modelSize = appState.currentModel.userData.size;
-    const tattooWorldSize = modelSize.x * appState.activeLayer.size;
-    const edgePoint3D = centerPoint3D.clone().add(new THREE.Vector3(tattooWorldSize / 2, 0, 0));
-    const edgePoint2D = toScreenPosition(edgePoint3D, appState.camera);
-
-    const dx = edgePoint2D.x - centerPoint2D.x;
-    const dy = edgePoint2D.y - centerPoint2D.y;
-    const screenRadius = Math.sqrt(dx * dx + dy * dy);
-
-    const rotation = appState.activeLayer.rotation * Math.PI / 180;
-
-    const cornerX = centerPoint2D.x + screenRadius * Math.cos(rotation - Math.PI / 4);
-    const cornerY = centerPoint2D.y + screenRadius * Math.sin(rotation - Math.PI / 4);
-
+    // Place green handle at a fixed pixel offset to the right of the move handle (screen space)
+    const offsetPx = 60; // distance in pixels to the right
     scaleRotateHandle.style.display = 'block';
-    scaleRotateHandle.style.left = `${cornerX}px`;
-    scaleRotateHandle.style.top = `${cornerY}px`;
+    scaleRotateHandle.style.left = `${centerPoint2D.x + offsetPx}px`;
+    scaleRotateHandle.style.top = `${centerPoint2D.y}px`;
 }
 
 function toScreenPosition(point3D, camera) {
@@ -135,6 +145,9 @@ function toScreenPosition(point3D, camera) {
 
 function onCanvasClick(event, isDrag = false) {
     if (isDrag && !isDraggingMove) return;
+
+    // Ignore clicks if the camera was moved, but allow drag events
+    if (!isDrag && isCameraMoving) return;
 
     // Don't do anything if a UI element was clicked
     const uiElements = document.querySelectorAll('#layers-panel, #side-menu, #hamburger-btn');
