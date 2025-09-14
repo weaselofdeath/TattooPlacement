@@ -19,7 +19,6 @@ export function updateTexture(appState) {
         if (!layer.visible) return;
 
         const size = ctx.canvas.width * layer.size;
-        // Use the UV property for positioning
         const x = layer.uv.x * ctx.canvas.width;
         const y = (1 - layer.uv.y) * ctx.canvas.height;
 

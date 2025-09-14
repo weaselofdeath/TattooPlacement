@@ -17,7 +17,6 @@ export function initGizmoEvents(state) {
     const canvas = appState.renderer.domElement;
     canvas.addEventListener('click', (event) => onCanvasClick(event, false));
 
-    // Track mouse movement to differentiate between camera movement and clicks
     canvas.addEventListener('mousedown', (event) => {
         isCameraMoving = false;
         mouseDownPosition = { x: event.clientX, y: event.clientY };
@@ -36,7 +35,6 @@ export function initGizmoEvents(state) {
         if (appState.pivotHelper) appState.pivotHelper.visible = false;
     });
 
-    // Handle Drag Listeners
     const moveHandle = document.getElementById('move-handle');
     const scaleRotateHandle = document.getElementById('scale-rotate-handle');
 
@@ -102,7 +100,6 @@ export function updateGizmoPositions(state) {
     const moveHandle = document.getElementById('move-handle');
     const scaleRotateHandle = document.getElementById('scale-rotate-handle');
 
-    // --- ICON INJECTION (only once) ---
     if (moveHandle && !moveHandle.querySelector('svg')) {
         moveHandle.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" style="position:absolute;top:0;left:0;right:0;bottom:0;margin:auto;display:block;pointer-events:none;" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10 2v16M2 10h16M5 5l10 10M15 5L5 15" stroke="white" stroke-width="2" stroke-linecap="round"/>
@@ -121,15 +118,13 @@ export function updateGizmoPositions(state) {
         return;
     }
 
-    // Use lastIntersect directly (already in world space)
     const centerPoint3D = appState.activeLayer.lastIntersect.clone();
     const centerPoint2D = toScreenPosition(centerPoint3D, appState.camera);
     moveHandle.style.display = 'block';
     moveHandle.style.left = `${centerPoint2D.x}px`;
     moveHandle.style.top = `${centerPoint2D.y}px`;
 
-    // Place green handle at a fixed pixel offset to the right of the move handle (screen space)
-    const offsetPx = 60; // distance in pixels to the right
+    const offsetPx = 60;
     scaleRotateHandle.style.display = 'block';
     scaleRotateHandle.style.left = `${centerPoint2D.x + offsetPx}px`;
     scaleRotateHandle.style.top = `${centerPoint2D.y}px`;
@@ -146,10 +141,8 @@ function toScreenPosition(point3D, camera) {
 function onCanvasClick(event, isDrag = false) {
     if (isDrag && !isDraggingMove) return;
 
-    // Ignore clicks if the camera was moved, but allow drag events
     if (!isDrag && isCameraMoving) return;
 
-    // Don't do anything if a UI element was clicked
     const uiElements = document.querySelectorAll('#layers-panel, #side-menu, #hamburger-btn');
     for (const el of uiElements) {
         if (el.contains(event.target)) return;
@@ -168,7 +161,6 @@ function onCanvasClick(event, isDrag = false) {
             appState.activeLayer.lastIntersect = intersect.point;
         }
     } else {
-        // If we clicked empty space, deselect the active layer
         if (!isDrag) {
             setActiveLayer(null);
         }

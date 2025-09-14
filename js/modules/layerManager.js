@@ -10,7 +10,7 @@ export function initLayerControls(state) {
 
 function attachLayerListeners() {
     const textureInput = document.getElementById('textureInput');
-    document.getElementById('addTattooBtn').onclick = () => textureInput.click();
+    document.getElementById('addTattooBtn').addEventListener('click', () => textureInput.click());
 
     textureInput.onchange = (event) => {
         const file = event.target.files[0];
@@ -50,7 +50,7 @@ function renderLayersUI() {
     [...appState.tattooLayers].reverse().forEach(layer => {
         const item = document.createElement('li');
         item.className = 'layer-item';
-        item.onclick = () => setActiveLayer(layer);
+        item.addEventListener('click', () => setActiveLayer(layer));
 
         if (appState.activeLayer && layer.id === appState.activeLayer.id) {
             item.classList.add('active');
@@ -61,7 +61,7 @@ function renderLayersUI() {
 
         const img = document.createElement('img');
         img.src = layer.image.src;
-        img.onclick = (e) => {
+        img.addEventListener('click', (e) => {
             e.stopPropagation();
             const replaceInput = document.createElement('input');
             replaceInput.type = 'file';
@@ -82,7 +82,7 @@ function renderLayersUI() {
                 }
             };
             replaceInput.click();
-        };
+        });
 
         const name = document.createElement('span');
         name.textContent = `Layer ${layer.id}`.slice(-6);
@@ -93,16 +93,16 @@ function renderLayersUI() {
         const visibilityBtn = document.createElement('button');
         visibilityBtn.className = 'toggle-visibility-btn';
         visibilityBtn.innerHTML = '👁️';
-        visibilityBtn.onclick = (e) => {
+        visibilityBtn.addEventListener('click',(e) => {
             e.stopPropagation();
             layer.visible = !layer.visible;
             renderLayersUI();
-        };
+        });
 
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'X';
         deleteBtn.className = 'delete';
-        deleteBtn.onclick = (e) => {
+        deleteBtn.addEventListener('click',(e) => {
             e.stopPropagation();
             appState.tattooLayers = appState.tattooLayers.filter(l => l.id !== layer.id);
             if (appState.activeLayer && appState.activeLayer.id === layer.id) {
@@ -111,7 +111,7 @@ function renderLayersUI() {
             } else {
                 renderLayersUI();
             }
-        };
+        });
 
         controls.appendChild(visibilityBtn);
         controls.appendChild(deleteBtn);
@@ -132,14 +132,12 @@ export function setActiveLayer(layer) {
         document.getElementById('tattooOpacitySlider').value = layer.opacity;
 
         if (!layer.lastIntersect) {
-            console.log("New layer detected, finding initial intersection point...");
             raycaster.setFromCamera(new THREE.Vector2(0, 0), appState.camera);
             const intersects = raycaster.intersectObject(appState.currentModel, true);
             if (intersects.length > 0) {
                 const intersect = intersects[0];
                 layer.uv = intersect.uv;
                 layer.lastIntersect = intersect.point;
-                console.log("Initial point found at UV:", layer.uv);
             } else {
                 console.warn("Could not find an initial intersection point for the new layer.");
             }

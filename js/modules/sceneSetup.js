@@ -2,8 +2,6 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 export function initScene() {
-    const appContainer = document.getElementById('app-container');
-
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf0f0f0);
 
@@ -12,7 +10,7 @@ export function initScene() {
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    appContainer.prepend(renderer.domElement);
+    document.body.prepend(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enablePan = true;

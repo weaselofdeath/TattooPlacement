@@ -10,12 +10,6 @@ canvas {
     display: block;
 }
 
-#app-container {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-}
-
 /* --- Hamburger Menu --- */
 #hamburger-btn {
     position: absolute;
@@ -193,3 +187,37 @@ input[type="color"] {
 .layer-controls button.delete { background-color: #ff3b30; }
 .toggle-visibility-btn { background-color: #a0a0a0; }
 .layer-item.hidden .toggle-visibility-btn { background-color: rgba(255,255,255,0.1); color: #888; }
+
+.layout_default.picker_wrapper {
+    width: inherit !important;
+    padding: 0 !important;
+    border-radius: 5px;
+}
+
+.picker_wrapper {
+    background: none !important;
+}
+
+.picker_editor {
+    margin-right: 0 !important;
+    input {
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+        padding-right: 0 !important;
+    }
+}
+
+.picker_sample {
+    margin-left: 0 !important;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.picker_sample::before {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.picker_done {
+    display: none !important;
+}

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { initLayerControls } from './layerManager.js';
 import { initGizmoEvents } from './gizmoManager.js';
+import Picker from 'vanilla-picker';
 
 let appState;
 
@@ -8,38 +9,20 @@ export async function initUIManager(state) {
     appState = state;
     appState.selectedColor = new THREE.Color(0xe0ac69);
 
-    await loadUI();
     attachUIListeners();
-    // Initialize the specialized UI modules
     initLayerControls(appState);
     initGizmoEvents(appState);
 }
 
-async function loadUI() {
-    try {
-        const response = await fetch('html/tattoo-view.html');
-        if (!response.ok) throw new Error(`Fetch UI failed: ${response.status}`);
-        const uiHTML = await response.text();
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = uiHTML;
-        while (tempDiv.firstChild) {
-            document.getElementById('app-container').appendChild(tempDiv.firstChild);
-        }
-        console.log("UI HTML loaded and attached.");
-    } catch (error) {
-        console.error("Error loading UI:", error);
-        throw error;
-    }
-}
 
 function attachUIListeners() {
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const sideMenu = document.getElementById('side-menu');
-    hamburgerBtn.onclick = (e) => {
+    hamburgerBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         sideMenu.classList.toggle('open');
         hamburgerBtn.classList.toggle('open');
-    };
+    });
 
     window.addEventListener('click', (e) => {
         if (!sideMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
@@ -58,15 +41,15 @@ function attachUIListeners() {
         const swatch = document.createElement('div');
         swatch.className = 'swatch';
         swatch.style.backgroundColor = `#${new THREE.Color(hex).getHexString()}`;
-        swatch.onclick = () => {
+        swatch.addEventListener('click', () => {
             appState.selectedColor.set(hex);
-        };
+        });
         paletteContainer.appendChild(swatch);
     });
 
     const switchModelBtn = document.getElementById('switchModelBtn');
     switchModelBtn.textContent = 'Switch to Feminine';
-    switchModelBtn.onclick = () => {
+    switchModelBtn.addEventListener('click', () => {
         appState.currentModel.visible = false;
         if (appState.currentModel === appState.maleModel) {
             appState.currentModel = appState.femaleModel;
@@ -76,10 +59,17 @@ function attachUIListeners() {
             switchModelBtn.textContent = 'Switch to Feminine';
         }
         appState.currentModel.visible = true;
-    };
-
-    const bgColorPicker = document.getElementById('bgColorPicker');
-    bgColorPicker.addEventListener('input', (e) => {
-        appState.scene.background.set(e.target.value);
     });
+
+    const bgColorPicker = document.getElementById('backgroundColorPicker');
+    var picker = new Picker({
+        parent: bgColorPicker,
+        popup: false,
+        alpha: false,
+        color: "#f0f0f0",
+
+    });
+    picker.onChange = function(color) {
+        appState.scene.background.set(color.rgbString);
+    };
 }

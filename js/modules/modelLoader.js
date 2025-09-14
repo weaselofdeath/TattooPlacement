@@ -6,17 +6,14 @@ function processModel(model) {
     const center = box.getCenter(new THREE.Vector3());
     model.position.sub(center);
     model.userData.size = box.getSize(new THREE.Vector3());
-    console.log(`Model centered. Original center was at:`, center);
 }
 
 export async function loadModels(scene, skinMaterial) {
     const loader = new OBJLoader();
 
     const loadPromise = (url) => new Promise((resolve, reject) => {
-        console.log(`Attempting to load model: ${url}`);
         loader.load(url,
             (obj) => {
-                console.log(`Successfully loaded ${url}`);
                 resolve(obj);
             },
             undefined,

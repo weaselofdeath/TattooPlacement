@@ -1,11 +1,9 @@
-<!-- Hamburger Menu Button -->
 <button id="hamburger-btn">
     <span></span>
     <span></span>
     <span></span>
 </button>
 
-<!-- Side Menu (for main controls) -->
 <div id="side-menu">
     <div class="control-section">
         <h3>Model</h3>
@@ -19,7 +17,6 @@
             <input type="range" id="intensitySlider" min="0.25" max="1" value="1" step="0.01">
         </div>
     </div>
-    <!-- NEW: Background Color Picker -->
     <div class="control-section">
         <h3>Scene</h3>
         <div class="color-picker-container">
@@ -29,9 +26,7 @@
     </div>
 </div>
 
-<!-- Container for all bottom-left UI -->
 <div id="bottom-left-ui-container">
-    <!-- The Layers Panel -->
     <div id="layers-panel">
         <div class="control-section">
             <h3>Tattoo Layers</h3>
@@ -40,7 +35,6 @@
             <ul id="layers-list"></ul>
         </div>
     </div>
-    <!-- The "Active Tattoo" editor (now a separate panel) -->
     <div id="layer-editor" style="display: none;">
         <h4>Active Tattoo</h4>
         <div class="slider-container">
@@ -58,7 +52,5 @@
     </div>
 </div>
 
-
-<!-- On-model handles for tattoo manipulation -->
 <div id="move-handle" class="gizmo-handle" style="display: none;"></div>
 <div id="scale-rotate-handle" class="gizmo-handle" style="display: none;"></div>
