@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>3D Model Tattoo Test</title>
+      <script type="module" crossorigin src="./assets/index-C6UHLgG3.js"></script>
+      <link rel="modulepreload" crossorigin href="./assets/three-xPsQEuOQ.js">
+      <link rel="stylesheet" crossorigin href="./assets/index-CktrsEK4.css">
+    </head>
+    <body>
+        <button id="hamburger-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div id="side-menu">
+            <div class="control-section">
+                <h3>Model</h3>
+                <button id="switchModelBtn">Switch Model</button>
+            </div>
+            <div class="control-section">
+                <h3>Skin</h3>
+                <div id="paletteContainer"></div>
+                <div class="popup-slider-container">
+                    <label for="intensitySlider">Intensity</label>
+                    <input type="range" id="intensitySlider" min="0.25" max="1" value="1" step="0.01">
+                </div>
+            </div>
+            <div class="control-section">
+                <h3>Scene</h3>
+                <div id="backgroundColorPicker" class="color-picker-container">
+                    <label>Background Color</label>
+                </div>
+            </div>
+        </div>
+
+        <div id="bottom-left-ui-container">
+            <div id="layers-panel">
+                <div class="control-section">
+                    <h3>Tattoo Layers</h3>
+                    <button id="addTattooBtn">Add Tattoo</button>
+                    <input type="file" id="textureInput" style="display: none;">
+                    <ul id="layers-list"></ul>
+                </div>
+            </div>
+            <div id="layer-editor" style="display: none;">
+                <h4>Active Tattoo</h4>
+                <div class="slider-container">
+                    <label for="tattooSizeSlider">Size</label>
+                    <input type="range" id="tattooSizeSlider" min="0.05" max="0.5" value="0.1" step="0.005">
+                </div>
+                <div class="slider-container">
+                    <label for="tattooRotationSlider">Rotation</label>
+                    <input type="range" id="tattooRotationSlider" min="0" max="360" value="0" step="1">
+                </div>
+                <div class="slider-container">
+                    <label for="tattooOpacitySlider">Opacity</label>
+                    <input type="range" id="tattooOpacitySlider" min="0" max="1" value="1" step="0.01">
+                </div>
+            </div>
+        </div>
+
+        <div id="move-handle" class="gizmo-handle" style="display: none;"></div>
+        <div id="scale-rotate-handle" class="gizmo-handle" style="display: none;"></div>
+    </body>
+</html>
